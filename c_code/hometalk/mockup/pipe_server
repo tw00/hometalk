@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+
+$pipe = "/tmp/pipe";
+$mode = 0600;
+
+if(!file_exists($pipe)) {
+    // create the pipe
+    umask(0);
+    posix_mkfifo($pipe,$mode);
+} else {
+    echo "pipe exists...\n";
+}
+$f = fopen($pipe,"r+");
+socket_set_blocking($f,true); 
+
+$cmd = "";
+
+while($cmd != 'exit')
+{
+    $cmd = fgets($f, 1024);
+    if(!$cmd) continue;
+    echo "Received: $cmd";
+}
+
+echo "Shutting down...\n";
+fclose($f);
+unlink($pipe); //delete pipe
+
+
+
+# TODO: RÜCKMELDUNG VIA REST!!!

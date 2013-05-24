@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php
+
+if( count($argv) <= 1 ) die("Usage: pipe_client <cmd>\n\n");
+$cmd = $argv[1];
+
+$pipe="/tmp/pipe";
+
+if(!file_exists($pipe)) {
+    echo "I am not blocked!";
+} else {
+    //block and read from the pipe
+    $f = fopen($pipe, "r+");
+    echo "writing...\n";
+    fwrite($f, "$cmd\n");
+#    echo "receiving...\n";
+#    stream_set_timeout($f, 3); //5 seconds read timeout
+#    $r = fread($f,10);
+#    if(!$r) echo "Error while reading";
+#    else echo "Read ok: $r";
+}

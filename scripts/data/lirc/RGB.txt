@@ -1,0 +1,46 @@
+begin remote
+
+  name  APA1616
+  bits           24
+  flags SPACE_ENC|CONST_LENGTH
+#  eps            30
+#  aeps          100
+
+#  header       9065  4480
+#  one           580  1660
+#  zero          580   550
+#  ptrail        580
+#  repeat       9060  2230
+  pre_data_bits   8
+  pre_data       0xF7
+#  gap          108434
+#  toggle_bit      0
+
+
+    begin codes
+        up          0x00FF
+        down        0x807F
+        off         0x40BF
+        one         0xC03F
+        re          0x20DF
+        gap         0xA05F
+        b           0x609F
+        W           0xE01F
+        C1          0x10EF
+        C2          0xA05F
+        C3          0x609F
+        C4          0x30CF
+        C5          0xB04F
+        C6          0x708F
+        C7          0x08F7
+        C8          0x8877
+        C9          0x48B7
+        C10         0x28D7
+        C11         0xA857
+        C12         0x6897
+        flash       0xD02F
+        strobe      0xF00F
+        fade        0xC837
+        smooth      0xE817
+    end codes
+end remote

@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+
+define('N_BYTES_HEADER', 12);
+
+if($argc == 2) {
+    $ip = $argv[1];
+} else {
+    die('Usage: tx_test <ip>'."\n");
+}
+
+$fp = fsockopen($ip, 3001, $errno, $errstr, 30);
+if (!$fp) {
+    echo "Error: $errstr ($errno)\n";
+} else {
+    for($i = 0; $i < 10; $i++) {
+        $out = str_repeat(chr(ord('A')+$i),16);
+        echo "Sending: $out\n";
+        $s = fputs($fp, $out, 16);
+        echo " s: $s\n"; 
+#        usleep(1300*1000);
+    }
+    fclose($fp);
+}
+

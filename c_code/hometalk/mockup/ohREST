@@ -1,0 +1,94 @@
+#!/usr/bin/env php
+<?php
+
+function check_arg(&$argv, $trigger)
+{
+    $pos = array_search($trigger, $argv);
+    if($pos > 0) {
+        $ENABLE_VERBOSE = true;
+        unset($argv[$pos]);
+        $argv = array_values($argv);
+        return true;
+    }
+    return false;
+} 
+
+/* ************************ */
+
+$host = "localhost";
+$port = "8080";
+
+$ENABLE_VERBOSE = check_arg($argv, '-v');
+
+if( count($argv) == 2 ) {
+    $item = $argv[1];
+    $method = "GET";
+    $url = "http://$host:$port/rest/items/$item/state";
+} else if( count($argv) == 3 ) {
+    $item = $argv[1];
+    $data = $argv[2];
+    $method = "PUT";
+    $url = "http://$host:$port/rest/items/$item/state";
+} else if( count($argv) == 4 ) {
+    $item = $argv[1];
+    $data = $argv[2];
+    $method = $argv[3];
+    $url = "http://$host:$port/rest/items/$item";
+} else {
+    die("Usage: ohREST [-v] <item/'all'> [<cmd>] [<method>]\n\n");
+}
+
+if($item == "all") {
+    $url = "http://$host:$port/rest/items?type=json";
+}
+
+$headers = array('Content-Type: text/plain');
+
+$handle = curl_init();
+curl_setopt($handle, CURLOPT_URL, $url);
+curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
+curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
+
+switch($method) {
+    case 'GET':
+        break;
+
+    case 'POST':
+        curl_setopt($handle, CURLOPT_POST, true);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, $data);
+        break;
+
+    case 'PUT':
+        curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'PUT');
+        curl_setopt($handle, CURLOPT_POSTFIELDS, $data);
+        break;
+
+    case 'DELETE':
+        curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'DELETE');
+        break;
+}
+
+$response = curl_exec($handle);
+
+if($item == "all") {
+    $obj = json_decode($response);
+    foreach($obj->item as $key => $val) {
+        echo " - ".($val->name)." (".($val->type).")".": \t".($val->state)."\n";
+    }
+} else {
+    echo $response;
+    echo "\n";
+}
+
+if($ENABLE_VERBOSE) {
+    $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+    echo "CODE: $code\n";
+}
+
+#return $code - 400;
+return 1;
+exit(1);
+
+// curl -X PUT -H"Content-Type:text/plain" -d "ON" http://localhost:8080/rest/items/DemoSwitch/state
