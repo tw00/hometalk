@@ -29,4 +29,6 @@ void ht_debug_data(BYTE* frame);
 
 void ht_debug_frame(hometalkCommand* command);
 
+void ht_debug_header(DBYTE header);
+
 #endif

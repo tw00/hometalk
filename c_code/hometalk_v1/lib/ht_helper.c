@@ -76,3 +76,20 @@ void ht_debug_frame(hometalkCommand* command)
     printf("  seqnum: %d\n", command->seqnum);
 }
 
+/*****************************************************************************/
+void ht_debug_header(DBYTE header)
+{
+    int x = 0;
+    const char* type_str = "test";
+    
+    printf("header:\n");
+    printf("  magic byte: %d\n", x );
+    printf("  control field:\n");
+    printf("    FRT: %d\n", x);
+    printf("    RES: %d\n", x);
+    printf("    EXT: %d\n", x);
+    printf("    ROU: %d\n", x);
+    printf("    (Type: %s)\n", type_str);
+    printf("  seqnum: %d\n", x);
+
+}

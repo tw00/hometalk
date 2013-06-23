@@ -28,4 +28,6 @@ hometalkCommand* ht_decode_frame(BYTE* frame, int length);
 
 QUAD_BYTE ht_cmd_as_quad(hometalkCommand* command);
 
+DBYTE ht_enconde_header( HtFrameType type, BOOL isRoutedFrame, long seq );
+
 #endif
