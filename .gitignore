@@ -18,3 +18,9 @@
 
 # Mac
 .DS_Store
+
+# Directories
+_OLD/
+c_code/hometalk_v1/build/
+scripts/tests/getch/build/
+cli_remote/php-serial/.svn/
