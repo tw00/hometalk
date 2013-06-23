@@ -1,0 +1,39 @@
+#!/usr/bin/env php
+<?php
+
+define('N_BYTES_HEADER', 12);
+
+function bytedump($bytes)
+{
+    $n = strlen($bytes);
+    for($i = 0; $i < $n; $i++){
+        $v = ord($bytes{$i});
+        printf("%02x | %3d | '%c'\n", $v, $v, $v);
+    }
+}
+
+if($argc == 3) {
+    $ip = $argv[1];
+    $cmd = $argv[2];
+} else {
+    die('Usage: irsend_net <ip> <cmd>'."\n");
+}
+
+$fp = fsockopen($ip, 3001, $errno, $errstr, 30);
+if (!$fp) {
+        echo "Error: $errstr ($errno)\n";
+} else {
+    $header = fread($fp, N_BYTES_HEADER);
+    bytedump($header);
+
+    $line = fgets($fp, 999);
+    echo $line;
+
+    $header = chr(255).chr(253).chr(3);
+    $out = $header . $cmd . "!\r\n";
+    fwrite($fp, $out);
+    // TODO: ERROR?
+    // TODO: Antwort
+    fclose($fp);
+}
+

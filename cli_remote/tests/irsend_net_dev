@@ -1,0 +1,54 @@
+#!/usr/bin/env php
+<?php
+
+define('N_BYTES_HEADER', 12);
+
+function bytedump($bytes)
+{
+    $n = strlen($bytes);
+    for($i = 0; $i < $n; $i++){
+        $v = ord($bytes{$i});
+        printf("%02x | %3d | '%c'\n", $v, $v, $v);
+    }
+}
+
+if($argc == 4) {
+    $ip = $argv[1];
+    $dev = $argv[2];
+    $cmd = $argv[3];
+} else {
+    die('Usage: irsend_net <ip> <dev> <cmd>'."\n");
+}
+
+$fp = fsockopen($ip, 3000, $errno, $errstr, 30);
+if (!$fp) {
+        echo "Error: $errstr ($errno)\n";
+} else {
+    $header = fread($fp, N_BYTES_HEADER);
+    bytedump($header);
+
+    $line = fgets($fp, 999);
+    echo $line;
+
+    $header = chr(255).chr(253).chr(3);
+    $cmd = "***" . $dev . ":" . $cmd . ":" . rand(1,100) . "!";
+    echo "Sending: $cmd\n";
+    $out = $header . $cmd . "\r\n";
+    $out = $header . $cmd;
+    $send_array = str_split($out, 16);
+    print_r($send_array);
+    foreach($send_array as $subout ) {
+        #fwrite($fp, $subout, 16);
+        fputs($fp, $subout, 16);
+#        fflush($fp);
+        echo "Waiting...\n";
+        usleep(1300*1000);
+#        $line = fgets($fp, 100);
+#        print_r($line);
+    }
+    // TODO: ERROR?
+    // TODO: Antwort
+    fclose($fp);
+    bytedump($out);
+}
+
