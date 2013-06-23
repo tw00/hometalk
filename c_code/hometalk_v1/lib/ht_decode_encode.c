@@ -5,7 +5,7 @@
 /*****************************************************************************/
 BYTE* ht_encode_frame(hometalkCommand* ht_cmd)
 {
-    BYTE frame[HT_FRAME_LENGTH];
+    static BYTE frame[HT_FRAME_LENGTH]; // HACK
 
     frame[0] = 0xd7;
     frame[1] = 0xd7;
@@ -13,7 +13,7 @@ BYTE* ht_encode_frame(hometalkCommand* ht_cmd)
 
 //    memcpy(&frame[4], ht_cmd, sizeof(hometalkCommand)-1);
 
-    return &frame;
+    return (BYTE *)&frame;
 }
 
 /*****************************************************************************/
@@ -21,7 +21,7 @@ hometalkCommand* ht_decode_frame(BYTE* frame, int length)
 {
     char   data[11]; // ??????
     hometalkCommand* command;
-    unsigned long test;
+    // unsigned long test;
 
     memcpy(data, &frame[4], sizeof(hometalkCommand)-1);
     command = (hometalkCommand *)data;

@@ -1,0 +1,40 @@
+Arduino -> OpenWRT
+------------------
+
+"Hello, world?\n"
+
+656c 6c6f 2c20 77    ello,.w
+6f72 6c64 3f0d 0a    orld?..
+
+
+"X" "Y" "Z"
+
+5800 04c3 dc2d       X....-
+5900 a8a0 b181       Y.....
+5a00 d5d1 2793       Z...'.
+
+
+17:23:47.746538 IP (tos 0x0, ttl 64, id 45546, offset 0, flags [DF], proto TCP (6), length 41) 192.168.11.85.3001 > 192.168.11.66.55420: Flags [P.], cksum 0x53fe (correct), seq 589692533:589692534, ack 1819008292, win 7300, length 1
+17:23:48.609140 IP (tos 0x0, ttl 64, id 45547, offset 0, flags [DF], proto TCP (6), length 41) 192.168.11.85.3001 > 192.168.11.66.55420: Flags [P.], cksum 0x52fd (correct), seq 589692534:589692535, ack 1819008292, win 7300, length 1
+17:23:50.000177 IP (tos 0x0, ttl 64, id 45548, offset 0, flags [DF], proto TCP (6), length 41) 192.168.11.85.3001 > 192.168.11.66.55420: Flags [P.], cksum 0x51fc (correct), seq 589692535:589692536, ack 1819008292, win 7300, length 1
+
+    0x0020:  5018 1c84 53fe 0000 | 5800 | 8f16 800f       P...S...  X. ....
+    0x0020:  5018 1c84 52fd 0000 | 5900 | ea69 5d23       P...R...  Y. .i]#
+    0x0020:  5018 1c84 51fc 0000 | 5a00 | d13b aa30       P...Q...  Z. .;.0
+
+
+
+OpenWRT -> Arduino
+------------------
+
+"NC2NET" <ENTER>
+
+4e43 324e 4554 0a    NC2NET.
+
+    0x0020:  5018 4000 9809 0000 4e43 324e 4554 0a    P.@.....NC2NET.
+    0x0020:  5018 4000 9808 0000 4e43 324e 540a       P.@.....NC2NT.
+
+Response:
+    0x0020   ???? ???? ???? ???? 0000 0d25 f65e                 ..%.^
+    0x0020:  5010 1c84 abfd 0000 0000 e8ed 188c       P........ .....
+    0x0020:  5010 1c84 abf7 0000 0000 a52d d15f       P........ ..-._

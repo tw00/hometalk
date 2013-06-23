@@ -20,6 +20,7 @@ int ht_readdata(BYTE* frame, const char* filename)
         return 3;
     }
     fclose(fr);
+    return 0;
 }
 /*****************************************************************************/
 int ht_writedata(hometalkCommand* cmd, const char* filename)
@@ -42,6 +43,7 @@ int ht_writedata(hometalkCommand* cmd, const char* filename)
     }
 
     fclose(fr);
+    return 0;
 }
 
 
