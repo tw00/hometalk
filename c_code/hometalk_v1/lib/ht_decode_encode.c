@@ -42,29 +42,36 @@ QUAD_BYTE ht_cmd_as_quad(hometalkCommand* command)
 /*****************************************************************************/
 DBYTE ht_enconde_header( HtFrameType type, BOOL isRoutedFrame, long seq )
 {
-    char FRT, RES, EXT, ROU;
+    // TODO: falschrum
+    
+    HBYTE FRT, RES, EXT, ROU;
     HBYTE seq_hbyte = seq % 16; // = 2^4 
 
-    RES = 1;
-    FRT = 0; EXT = 0;
+    RES = 0xf;
+    FRT = 0x0; EXT = 0x0;
     switch( type ) {
-        case CMD:  FRT = 0; EXT = 0; break;
-        case eCMD: FRT = 0; EXT = 1; break;
-        case FLOW: FRT = 1; EXT = 0; break;
-        case PSI:  FRT = 1; EXT = 1; break;
+        case CMD:  FRT = 0x0; EXT = 0x0; break;
+        case eCMD: FRT = 0x0; EXT = 0xf; break;
+        case FLOW: FRT = 0xf; EXT = 0x0; break;
+        case PSI:  FRT = 0xf; EXT = 0xf; break;
         default:
             // TODO
         break;
     }
 
-    if( isRoutedFrame ) ROU = 1;
-    else                ROU = 0;
+    if( isRoutedFrame ) ROU = 0xf;
+    else                ROU = 0x0;
+
+    /*printf("FRT: %#x\n", FRT);
+    printf("RES: %#x\n", RES);
+    printf("EXT: %#x\n", EXT);
+    printf("ROU: %#x\n", ROU);*/
 
     return (DBYTE)(
         (HT_HEADER_MAGIC_BYTE << 8 ) |
-        (HT_HEADER_CONTROLFIELD_FRT << 4 | FRT ) | 
-        (HT_HEADER_CONTROLFIELD_RES << 4 | RES ) | 
-        (HT_HEADER_CONTROLFIELD_EXT << 4 | EXT ) | 
-        (HT_HEADER_CONTROLFIELD_ROU << 4 | ROU ) |
+        ( (HT_HEADER_CONTROLFIELD_FRT & FRT ) << 4 ) | 
+        ( (HT_HEADER_CONTROLFIELD_RES & RES ) << 4 ) | 
+        ( (HT_HEADER_CONTROLFIELD_EXT & EXT ) << 4 ) | 
+        ( (HT_HEADER_CONTROLFIELD_ROU & ROU ) << 4 ) |
         (seq_hbyte << 0 ));
 }

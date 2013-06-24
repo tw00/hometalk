@@ -82,19 +82,28 @@ void ht_debug_header(DBYTE header)
     char mb;
     BOOL FRT, RES, EXT, ROU;
     HBYTE seq;
+    BYTE B1, B2;
     const char* const str_array[] = { "CMD", "eCMD", "FLOW", "PSI" };
     char* type_str;
 
-    mb  = header >> 8;
-    FRT = (HT_HEADER_CONTROLFIELD_FRT | header >> 4);
-    RES = (HT_HEADER_CONTROLFIELD_RES | header >> 4);
-    EXT = (HT_HEADER_CONTROLFIELD_EXT | header >> 4);
-    ROU = (HT_HEADER_CONTROLFIELD_ROU | header >> 4);
-    seq = (0b1111 | header); 
+    mb  = (BYTE)(header >> 8);
+    FRT = (BOOL)((HT_HEADER_CONTROLFIELD_FRT & header >> 4) > 0);
+    RES = (BOOL)((HT_HEADER_CONTROLFIELD_RES & header >> 4) > 0);
+    EXT = (BOOL)((HT_HEADER_CONTROLFIELD_EXT & header >> 4) > 0);
+    ROU = (BOOL)((HT_HEADER_CONTROLFIELD_ROU & header >> 4) > 0);
+    seq = (HBYTE)(0b00001111 & header); 
 
-    type_str = str_array[1];
+    if( !FRT && !EXT) type_str = str_array[CMD];
+    if( !FRT &&  EXT) type_str = str_array[eCMD];
+    if(  FRT && !EXT) type_str = str_array[FLOW];
+    if(  FRT &&  EXT) type_str = str_array[PSI];
+
+    B1 = (header & 0x000000ff);
+    B2 = (header & 0x0000ff00) >> 8;
 
     printf("header:\n");
+    printf("  binary: (1) 0b%s\n", ht_byte_to_binary( B1 ) );
+    printf("          (2) 0b%s\n", ht_byte_to_binary( B2 ) );
     printf("  magic byte: %#x\n", mb );
     printf("  control field:\n");
     printf("    FRT: %d\n", FRT);
@@ -103,5 +112,21 @@ void ht_debug_header(DBYTE header)
     printf("    ROU: %d\n", ROU);
     printf("    (Type: %s)\n", type_str);
     printf("  seqnum: %d\n", seq);
-
 }
+
+/*****************************************************************************/
+const char* ht_byte_to_binary(BYTE x)
+{
+    static char b[sizeof(BYTE)*8+1] = {0};
+    int y;
+    long long z;
+
+    for (z=1LL<<(sizeof(BYTE)*8-1),y=0; z>0; z>>=1,y++) {
+        b[y] = ( ((x & z) == z) ? '1' : '0');
+    }
+
+    b[y] = 0;
+    return b;
+}
+
+

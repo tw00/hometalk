@@ -24,26 +24,27 @@ int main(int argc, char *argv[])
         }
     } 
 
-    fputs("start...\n\n", stdout);
+    printf("[1] ht_enconde_header( CMD,  false, 5 )\n");
+    printf("[2] ht_enconde_header( eCMD,  false, 6 )\n");
+    printf("[3] ht_enconde_header( FLOW, false, 7 )\n");
+    printf("[4] ht_enconde_header( PSI,  false, 8 )\n");
+    printf("[5] ht_enconde_header( eCMD, true,  9645 )\n");
 
     header1 = ht_enconde_header( CMD,  false, 5 );
-    fputs("---------------------------------\n", stdout);
-    ht_debug_header(header1);
-
     header2 = ht_enconde_header( eCMD, false, 6 );
-    fputs("---------------------------------\n", stdout);
-    ht_debug_header(header2);
-
     header3 = ht_enconde_header( FLOW, false, 7 );
-    fputs("---------------------------------\n", stdout);
-    ht_debug_header(header3);
-
     header4 = ht_enconde_header( PSI,  false, 8 );
-    fputs("---------------------------------\n", stdout);
-    ht_debug_header(header4);
-
     header5 = ht_enconde_header( eCMD, true,  9645 );
-    fputs("---------------------------------\n", stdout);
+
+    fputs("[1] ---------------------------------\n", stdout);
+    ht_debug_header(header1);
+    fputs("[2] ---------------------------------\n", stdout);
+    ht_debug_header(header2);
+    fputs("[3] ---------------------------------\n", stdout);
+    ht_debug_header(header3);
+    fputs("[4] ---------------------------------\n", stdout);
+    ht_debug_header(header4);
+    fputs("[5] ---------------------------------\n", stdout);
     ht_debug_header(header5);
 
     return 0;

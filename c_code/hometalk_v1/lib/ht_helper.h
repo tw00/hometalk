@@ -31,4 +31,6 @@ void ht_debug_frame(hometalkCommand* command);
 
 void ht_debug_header(DBYTE header);
 
+const char* ht_byte_to_binary(BYTE x);
+
 #endif
