@@ -5,7 +5,6 @@
 
 #include <stdio.h>  
 #include <string.h>
-#include <ht_common.h>
 #include <ht_decode_encode.h>
 
 int usage()
@@ -19,12 +18,13 @@ int main(int argc, char *argv[])
 {
 
     DBYTE header1, header2, header3, header4, header5;
-
-    if (argc >= 1) {
+    if (argc > 1) {
         if( strcmp(argv[1],"--help" ) == 0 || strcmp(argv[1],"-h" ) == 0) {
             return usage();
         }
     } 
+
+    fputs("start...\n\n", stdout);
 
     header1 = ht_enconde_header( CMD,  false, 5 );
     fputs("---------------------------------\n", stdout);

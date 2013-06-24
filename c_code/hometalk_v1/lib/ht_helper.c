@@ -79,17 +79,29 @@ void ht_debug_frame(hometalkCommand* command)
 /*****************************************************************************/
 void ht_debug_header(DBYTE header)
 {
-    int x = 0;
-    const char* type_str = "test";
-    
+    char mb;
+    BOOL FRT, RES, EXT, ROU;
+    HBYTE seq;
+    const char* const str_array[] = { "CMD", "eCMD", "FLOW", "PSI" };
+    char* type_str;
+
+    mb  = header >> 8;
+    FRT = (HT_HEADER_CONTROLFIELD_FRT | header >> 4);
+    RES = (HT_HEADER_CONTROLFIELD_RES | header >> 4);
+    EXT = (HT_HEADER_CONTROLFIELD_EXT | header >> 4);
+    ROU = (HT_HEADER_CONTROLFIELD_ROU | header >> 4);
+    seq = (0b1111 | header); 
+
+    type_str = str_array[1];
+
     printf("header:\n");
-    printf("  magic byte: %d\n", x );
+    printf("  magic byte: %#x\n", mb );
     printf("  control field:\n");
-    printf("    FRT: %d\n", x);
-    printf("    RES: %d\n", x);
-    printf("    EXT: %d\n", x);
-    printf("    ROU: %d\n", x);
+    printf("    FRT: %d\n", FRT);
+    printf("    RES: %d\n", RES);
+    printf("    EXT: %d\n", EXT);
+    printf("    ROU: %d\n", ROU);
     printf("    (Type: %s)\n", type_str);
-    printf("  seqnum: %d\n", x);
+    printf("  seqnum: %d\n", seq);
 
 }

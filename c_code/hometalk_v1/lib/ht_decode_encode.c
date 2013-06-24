@@ -43,7 +43,7 @@ QUAD_BYTE ht_cmd_as_quad(hometalkCommand* command)
 DBYTE ht_enconde_header( HtFrameType type, BOOL isRoutedFrame, long seq )
 {
     char FRT, RES, EXT, ROU;
-    HBYTE seq_hbyte = seq % (2^4); 
+    HBYTE seq_hbyte = seq % 16; // = 2^4 
 
     RES = 1;
     FRT = 0; EXT = 0;
