@@ -129,4 +129,27 @@ const char* ht_byte_to_binary(BYTE x)
     return b;
 }
 
+/*****************************************************************************/
+UBYTE ht_gray_encode_ubyte(UBYTE n) {
+    return n ^ (n >> 1);
+}
+
+/*****************************************************************************/
+UBYTE ht_gray_decode_ubyte(UBYTE n) {
+	UBYTE p = n;
+    while (n >>= 1) {
+    	p ^= n;
+    }
+    return p;
+}
+
+/*****************************************************************************/
+BYTE ht_gray_decode_byte(BYTE n){
+	return (BYTE)ht_gray_decode_ubyte((UBYTE)n);
+}
+
+/*****************************************************************************/
+BYTE ht_gray_encode_byte(BYTE n) {
+	return (BYTE)ht_gray_encode_ubyte((UBYTE)n);
+}
 

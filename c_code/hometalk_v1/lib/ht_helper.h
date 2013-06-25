@@ -33,4 +33,12 @@ void ht_debug_header(DBYTE header);
 
 const char* ht_byte_to_binary(BYTE x);
 
+UBYTE ht_gray_decode_ubyte(UBYTE n);
+
+UBYTE ht_gray_encode_ubyte(UBYTE n);
+
+BYTE ht_gray_decode_byte(BYTE n);
+
+BYTE ht_gray_encode_byte(BYTE n);
+
 #endif
