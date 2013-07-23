@@ -6,6 +6,7 @@
 #include <stdio.h>  
 #include <string.h>
 #include <ht_decode_encode.h>
+#include <ht_helper.h>
 
 int usage()
 {
@@ -31,7 +32,7 @@ int main(int argc, char *argv[])
     }
 
     ht_readdata(command_raw, filename);
-    ht_debug_data(&command_raw);
+    ht_debug_data(command_raw);
 
     command = ht_decode_frame(command_raw, HT_FRAME_LENGTH);
     ht_debug_frame(command);

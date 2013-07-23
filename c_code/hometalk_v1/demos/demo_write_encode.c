@@ -6,6 +6,7 @@
 #include <stdio.h>  
 #include <string.h>
 #include <ht_decode_encode.h>
+#include <ht_helper.h>
 
 int usage()
 {
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
     ht_writedata(&command, filename);
 
     command_raw = ht_encode_frame(&command);
-    ht_debug_data(&command_raw);
+    ht_debug_data(command_raw);
 
     return 0;
 }
