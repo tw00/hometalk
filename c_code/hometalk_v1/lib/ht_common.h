@@ -22,21 +22,30 @@
 #include <stdio.h>
 
 typedef enum { 
-    CMD,
-    eCMD,
-    FLOW,
-    PSI
+    CMD  = 0,
+    eCMD = 1,
+    FLOW = 2,
+    PSI  = 3,
+    ERROR = 15
 } HtFrameType;
+
+typedef enum {
+	OK = 0,
+	CRC_ERROR = 1,
+	POINTER_ERROR = 2
+} HtDecodeResult;
 
 typedef enum {
     false = 0,
     true
 } BOOL;
 
-#define HT_HEADER_CONTROLFIELD_FRT (1 << 0)  /* frame type */
-#define HT_HEADER_CONTROLFIELD_RES (1 << 1)  /* RESERVED = 1 */
-#define HT_HEADER_CONTROLFIELD_EXT (1 << 2)  /* Exteded frame bit */
-#define HT_HEADER_CONTROLFIELD_ROU (1 << 3)  /* Routing bit */
+#define HT_HEADER_CONTROLFIELD_FRT (1 << 3)  /* frame type */
+#define HT_HEADER_CONTROLFIELD_RES (1 << 2)  /* RESERVED = 1 */
+#define HT_HEADER_CONTROLFIELD_EXT (1 << 1)  /* Exteded frame bit */
+#define HT_HEADER_CONTROLFIELD_ROU (1 << 0)  /* Routing bit */
+
+#define HT_MAGIC_NUMBER 0xAAU
 
 typedef char HBYTE; // IMMER?
 typedef char BYTE; // IMMER?
@@ -60,41 +69,54 @@ typedef unsigned short DBYTE;
     DBYTE crc;
 } hometalkCMDwithRouting;*/
 
+
+typedef struct {
+	UBYTE seq:4;
+	UBYTE ctrlFrt:2;
+	UBYTE ctrlRes:1;
+	UBYTE ctrlExt:1;
+	UBYTE ctrlRou:1;
+} hometalkHeader;
+
 typedef struct 
 {
-    DBYTE header;
-    BYTE  addr;    
-    BYTE  func;
+	hometalkHeader header;
+    DBYTE addr;
+    UBYTE func;
     UBYTE cmd[4];
-    DBYTE crc;
 } hometalkCMD;
 
-/*typedef struct 
+typedef struct
+{
+	hometalkHeader header;
+    DBYTE sender;
+} hometalkFLOW;
+
+
+typedef struct 
+{
+	hometalkHeader header;
+    DBYTE addr;
+    UBYTE ID:4;
+    UBYTE res:4;
+    UBYTE payload[8];
+} hometalkPSI;
+
+/*typedef struct
 {
     DBYTE header;
-    QUAD_BYTE addr;    
+    QUAD_BYTE addr;
     BYTE  func;
     UBYTE cmd[8];
     DBYTE crc;
 } hometalkExCMD;*/
 
-typedef struct 
-{
-    DBYTE header;
-    BYTE addr;    
-    UBYTE payload[8];
-    DBYTE crc;
-} hometalkPSI;
 
-typedef struct 
-{
-    DBYTE header;
-    BYTE sender;    
-    DBYTE crc;
-} hometalkFLOW;
+
 
 
 /*************** OLD ************************/
+
 typedef struct
 {
     DBYTE addr;    // little endian
@@ -105,5 +127,6 @@ typedef struct
 } hometalkCommand;
 
 #define HT_FRAME_LENGTH 16
+
 
 #endif
