@@ -41,4 +41,8 @@ BYTE ht_gray_decode_byte(BYTE n);
 
 BYTE ht_gray_encode_byte(BYTE n);
 
+DBYTE crc16(UBYTE *addr, UBYTE num, DBYTE crc);
+
+unsigned int ter2dec(UBYTE *bin, UBYTE len);
+
 #endif

@@ -129,7 +129,13 @@ const char* ht_byte_to_binary(BYTE x)
     return b;
 }
 
+
 /*****************************************************************************/
+/*
+ * Gray Encoding/Decoding
+ * ================================
+ * based on http://rosettacode.org/wiki/Gray_code#C
+ *****************************************************************************/
 UBYTE ht_gray_encode_ubyte(UBYTE n) {
     return n ^ (n >> 1);
 }
@@ -151,5 +157,61 @@ BYTE ht_gray_decode_byte(BYTE n){
 /*****************************************************************************/
 BYTE ht_gray_encode_byte(BYTE n) {
 	return (BYTE)ht_gray_encode_ubyte((UBYTE)n);
+}
+
+/*****************************************************************************/
+/*
+ * 	CRC-16 calculation
+ *  ================================
+ *  based on http://www.mikrocontroller.net/topic/12177#79681
+ *****************************************************************************/
+
+#define crc16_poly 0xA001
+
+DBYTE crc16(UBYTE *addr, UBYTE num, DBYTE crc) {
+	BYTE i;
+
+	for (; num > 0; num--) {
+		crc ^= *addr;
+		addr++;
+		for (i = 8; i; i--) {
+			crc = (crc >> 1) ^ ((crc & 1) ? crc16_poly : 0 );
+		}
+	}
+
+	return crc;
+}
+
+unsigned int ter2dec(UBYTE *bin, UBYTE len) {
+	UBYTE k;
+	unsigned int factor = 1;
+	unsigned int res = 0;
+
+	for (k = len; k >= 0; k--) {
+
+		switch (bin[k]) {
+		case '0':
+			/* nothing to add */
+			break;
+
+		case '1':
+			res += factor;
+			break;
+
+		case '2':
+		case 'f':
+		case 'F':
+			res += factor * 2;
+			break;
+
+		default:
+			/* should never be reached */
+			break;
+		}
+
+
+		factor *= 3;	/* move to next digit */
+	}
+	return res;
 }
 
