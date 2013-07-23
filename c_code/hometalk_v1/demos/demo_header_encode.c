@@ -6,6 +6,7 @@
 #include <stdio.h>  
 #include <string.h>
 #include <ht_decode_encode.h>
+#include <ht_helper.h>
 
 int usage()
 {
