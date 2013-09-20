@@ -19,7 +19,10 @@
 #ifndef HT_HELPER_H
 #define HT_HELPER_H
 
-#include "ht_common.h"
+#ifdef __cplusplus	/* to make the lib compatible to Arduino */
+extern "C"{
+#endif
+
 
 int ht_readdata(BYTE* frame, const char* filename);
 
@@ -44,5 +47,9 @@ BYTE ht_gray_encode_byte(BYTE n);
 DBYTE crc16(UBYTE *addr, UBYTE num, DBYTE crc);
 
 unsigned int ter2dec(UBYTE *bin, UBYTE len);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif
