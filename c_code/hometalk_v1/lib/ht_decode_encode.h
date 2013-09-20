@@ -19,8 +19,12 @@
 #ifndef HT_DECODE_H
 #define HT_DECODE_H
 
-#include "ht_common.h"
 #include <string.h>
+
+
+#ifdef __cplusplus	/* to make the lib compatible to Arduino */
+extern "C"{
+#endif
 
 
 BYTE* ht_encode_frame(hometalkCommand* ht_cmd);
@@ -32,15 +36,20 @@ QUAD_BYTE ht_cmd_as_quad(hometalkCommand* command);
 DBYTE ht_enconde_header(HtFrameType type, BOOL isRoutedFrame, long seq);
 
 
-
-HtFrameType ht_determine_frame_type(UBYTE* buffer, UBYTE maxLength);
+UBYTE ht_get_frame_length_by_type(UBYTE buffer);
+HtFrameType ht_determine_frame_type(circular_buffer* buffer);
 
 BYTE* ht_encode_frame(hometalkCommand* ht_cmd);
 
-UBYTE ht_encode_cmd(hometalkCMD* cmd, UBYTE* buffer);
-UBYTE ht_encode_flow(hometalkFLOW* flow, UBYTE* buffer);
-UBYTE ht_encode_psi(hometalkPSI* psi, UBYTE* buffer);
-HtDecodeResult ht_decode_cmd(hometalkCMD* cmd, UBYTE* buffer);
-HtDecodeResult ht_decode_flow(hometalkFLOW* flow, UBYTE* buffer);
-HtDecodeResult ht_decode_psi(hometalkPSI* psi, UBYTE* buffer);
+UBYTE ht_encode_cmd(hometalkCMD* cmd, circular_buffer* buffer);
+UBYTE ht_encode_flow(hometalkFLOW* flow, circular_buffer* buffer);
+UBYTE ht_encode_psi(hometalkPSI* psi, circular_buffer* buffer);
+HtDecodeResult ht_decode_cmd(hometalkCMD* cmd, circular_buffer* buffer);
+HtDecodeResult ht_decode_flow(hometalkFLOW* flow, circular_buffer* buffer);
+HtDecodeResult ht_decode_psi(hometalkPSI* psi, circular_buffer* buffer);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
 #endif

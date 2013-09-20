@@ -1,3 +1,5 @@
+#include "ht_common.h"
+#include "ht_circularBuffer.h"
 #include "ht_decode_encode.h"
 #include "ht_helper.h"
 
@@ -65,96 +67,125 @@ hometalkCommand* ht_decode_frame(BYTE* frame, int length)
     return command;
 }
 
-UBYTE ht_encode_cmd(hometalkCMD* cmd, UBYTE* buffer) {
+UBYTE ht_encode_cmd(hometalkCMD* cmd, circular_buffer* buffer) {
 	DBYTE crcSum;
+	UBYTE queueBuffer[10];
 
 	if(NULL == cmd || NULL == buffer) {
 		return 0U;
 	}
 
-	buffer[0] = (UBYTE)HT_MAGIC_NUMBER;
+	ht_cb_push_back(buffer, (UBYTE)HT_MAGIC_NUMBER);
 	//buffer[1] = (UBYTE)((cmd->header.seq << 4) | (cmd->header.ctrlFrt << 3) | (cmd->header.ctrlRes << 2) | (cmd->header.ctrlExt << 1) | cmd->header.ctrlRou);
-	buffer[1] = (UBYTE)((cmd->header.seq << 4) | (0U << 1) | cmd->header.ctrlRou);
-	buffer[2] = (UBYTE)((cmd->addr >> 8 ) & 0xFF);
-	buffer[3] = (UBYTE)(cmd->addr & 0xFF);
-	buffer[4] = (UBYTE)(cmd->func);
-	buffer[5] = (UBYTE)(cmd->cmd[0]);
-	buffer[6] = (UBYTE)(cmd->cmd[1]);
-	buffer[7] = (UBYTE)(cmd->cmd[2]);
-	buffer[8] = (UBYTE)(cmd->cmd[3]);
+	queueBuffer[0] = (UBYTE)((cmd->header.seq << 4) | (0U << 1) | cmd->header.ctrlRou);
+	queueBuffer[1] = (UBYTE)((cmd->addr >> 8 ) & 0xFF);
+	queueBuffer[2] = (UBYTE)(cmd->addr & 0xFF);
+	queueBuffer[3] = (UBYTE)(cmd->func);
+	queueBuffer[4] = (UBYTE)(cmd->cmd[0]);
+	queueBuffer[5] = (UBYTE)(cmd->cmd[1]);
+	queueBuffer[6] = (UBYTE)(cmd->cmd[2]);
+	queueBuffer[7] = (UBYTE)(cmd->cmd[3]);
 
-	crcSum = crc16(buffer+1, 8, 0);
+	/* TODO: FIX BUFFER CONCEPT */
+	crcSum = crc16(queueBuffer, 8, 0);
 
-	buffer[9] = (UBYTE)((crcSum >> 8) & 0xFF);
-	buffer[10] = (UBYTE)(crcSum & 0xFF);
+	queueBuffer[8] = (UBYTE)((crcSum >> 8) & 0xFF);
+	queueBuffer[9] = (UBYTE)(crcSum & 0xFF);
+	
+	ht_cb_push_block_back(buffer, queueBuffer, 10);
 
 	return 11U;
 }
 
-UBYTE ht_encode_flow(hometalkFLOW* flow, UBYTE* buffer){
+UBYTE ht_encode_flow(hometalkFLOW* flow, circular_buffer* buffer) {
 	DBYTE crcSum;
-
+	UBYTE queueBuffer[5];
+	
 	if(NULL == flow || NULL == buffer) {
 		return 0U;
 	}
 
-	buffer[0] = (UBYTE)HT_MAGIC_NUMBER;
+	ht_cb_push_back(buffer, (UBYTE)HT_MAGIC_NUMBER);
 	//buffer[1] = (UBYTE)((flow->header.seq << 4) | (flow->header.ctrlFrt << 3) | (flow->header.ctrlRes << 2) | (flow->header.ctrlExt << 1) | flow->header.ctrlRou);
-	buffer[1] = (UBYTE)((flow->header.seq << 4) | (4U << 1) | flow->header.ctrlRou);
-	buffer[2] = (UBYTE)((flow->sender >> 8 ) & 0xFF);
-	buffer[3] = (UBYTE)(flow->sender & 0xFF);
+	queueBuffer[0] = (UBYTE)((flow->header.seq << 4) | (4U << 1) | flow->header.ctrlRou);
+	queueBuffer[1] = (UBYTE)((flow->sender >> 8 ) & 0xFF);
+	queueBuffer[2] = (UBYTE)(flow->sender & 0xFF);
 
-	crcSum = crc16(buffer+1, 3, 0);
+	crcSum = crc16(queueBuffer, 3, 0);
 
-	buffer[4] = (UBYTE)((crcSum >> 8) & 0xFF);
-	buffer[5] = (UBYTE)(crcSum & 0xFF);
+	queueBuffer[3] = (UBYTE)((crcSum >> 8) & 0xFF);
+	queueBuffer[4] = (UBYTE)(crcSum & 0xFF);
+	
+	ht_cb_push_block_back(buffer, queueBuffer, 5);
 
 	return 6U;
 }
 
-UBYTE ht_encode_psi(hometalkPSI* psi, UBYTE* buffer){
+UBYTE ht_encode_psi(hometalkPSI* psi, circular_buffer* buffer) {
 	DBYTE crcSum;
+	UBYTE queueBuffer[14];
 
 	if(NULL == psi || NULL == buffer) {
 		return 0U;
 	}
 
-	buffer[0] = (UBYTE)HT_MAGIC_NUMBER;
+	ht_cb_push_back(buffer, (UBYTE)HT_MAGIC_NUMBER);
 	//buffer[1] = (UBYTE)((psi->header.seq << 4) | (psi->header.ctrlFrt << 3) | (psi->header.ctrlRes << 2) | (psi->header.ctrlExt << 1) | psi->header.ctrlRou);
-	buffer[1] = (UBYTE)((psi->header.seq << 4) | (5U << 1) | psi->header.ctrlRou);
-	buffer[2] = (UBYTE)((psi->addr >> 8 ) & 0xFF);
-	buffer[3] = (UBYTE)(psi->addr & 0xFF);
-	buffer[4] = (UBYTE)((psi->ID << 4) | (psi->res & 0x0F));
-	buffer[5] = psi->payload[0];
-	buffer[6] = psi->payload[1];
-	buffer[7] = psi->payload[2];
-	buffer[8] = psi->payload[3];
-	buffer[9] = psi->payload[4];
-	buffer[10] = psi->payload[5];
-	buffer[11] = psi->payload[6];
-	buffer[12] = psi->payload[7];
+	queueBuffer[0] = (UBYTE)((psi->header.seq << 4) | (5U << 1) | psi->header.ctrlRou);
+	queueBuffer[1] = (UBYTE)((psi->addr >> 8 ) & 0xFF);
+	queueBuffer[2] = (UBYTE)(psi->addr & 0xFF);
+	queueBuffer[3] = (UBYTE)((psi->ID << 4) | (psi->res & 0x0F));
+	queueBuffer[4] = psi->payload[0];
+	queueBuffer[5] = psi->payload[1];
+	queueBuffer[6] = psi->payload[2];
+	queueBuffer[7] = psi->payload[3];
+	queueBuffer[8] = psi->payload[4];
+	queueBuffer[9] = psi->payload[5];
+	queueBuffer[10] = psi->payload[6];
+	queueBuffer[11] = psi->payload[7];
 
-	crcSum = crc16(buffer+1, 12, 0);
+	crcSum = crc16(queueBuffer, 12, 0);
 
-	buffer[13] = (UBYTE)((crcSum >> 8) & 0xFF);
-	buffer[14] = (UBYTE)(crcSum & 0xFF);
+	queueBuffer[12] = (UBYTE)((crcSum >> 8) & 0xFF);
+	queueBuffer[13] = (UBYTE)(crcSum & 0xFF);
+	
+	ht_cb_push_block_back(buffer, queueBuffer, 14);
 
 	return 15U;
 }
 
-HtFrameType ht_determine_frame_type(UBYTE* buffer, UBYTE maxLength) {
+UBYTE ht_get_frame_length_by_type(UBYTE buffer) {
 	UBYTE frameType;
+	
+	frameType = (UBYTE)(buffer & 0x0F);
+	if(0 == (frameType & HT_HEADER_CONTROLFIELD_FRT) ) {
+		if(0 == (frameType & HT_HEADER_CONTROLFIELD_EXT)){
+			return HT_CMD_FRAME_LENGTH;
+		} else {
+			return HT_EXCMD_FRAME_LENGTH;
+		}
+	} else {
+		if(0 == (frameType & HT_HEADER_CONTROLFIELD_EXT)){
+			return HT_FLOW_FRAME_LENGTH;
+		} else {
+			return HT_PSI_FRAME_LENGTH;
+		}
+	}
 
-	if(NULL == buffer || 0 == maxLength) {
+	return 0 /* ERROR */;
+}
+
+HtFrameType ht_determine_frame_type(circular_buffer* buffer) {
+	UBYTE frameType;
+	UBYTE queueBuffer;
+
+	if(NULL == buffer) {
 		return ERROR;
 	}
 
-	if(HT_MAGIC_NUMBER != buffer[0]) {
-		return ERROR;
-	}
-
-	/* determine message type by checking control field bits */
-	frameType = (UBYTE)(buffer[1] & 0x0F);
+	ht_cb_look_front(buffer, &queueBuffer, 0);	/* check first byte to determine frame type */
+	frameType = (UBYTE)(queueBuffer & 0x0F);	/* mask out reserved bits */
+	
 	if(0 == (frameType & HT_HEADER_CONTROLFIELD_FRT) ) {
 		if(0 == (frameType & HT_HEADER_CONTROLFIELD_EXT)){
 			return CMD;
@@ -172,72 +203,98 @@ HtFrameType ht_determine_frame_type(UBYTE* buffer, UBYTE maxLength) {
 	return ERROR;
 }
 
-HtDecodeResult ht_decode_cmd(hometalkCMD* cmd, UBYTE* buffer) {
+HtDecodeResult ht_decode_cmd(hometalkCMD* cmd, circular_buffer* buffer) {
 	DBYTE crcSum;
+	UBYTE queueBuffer[10];
+
 	if(NULL == buffer || NULL == cmd) {
 		return POINTER_ERROR;
 	}
-
+	
+	//ht_cb_pop_front(buffer, queueBuffer); /* get magic number */
+	//if(HT_MAGIC_NUMBER != queueBuffer[0]) {
+	//	return MAGIC_NUM_ERROR;
+	//}
+	
+	ht_cb_pop_block_front(buffer, queueBuffer, 10); /* get whole CMD frame from queue */
+	
 	/* check CRC check sum */
-	crcSum = (((DBYTE)buffer[9]) << 8) | ((DBYTE)buffer[10]);
-	if(crc16(buffer+1, 8, 0) != crcSum) {
+	crcSum = (((DBYTE)queueBuffer[8]) << 8) | ((DBYTE)queueBuffer[9]);
+	if(crc16(queueBuffer, 8, 0) != crcSum) {
 		return CRC_ERROR;
 	}
 
-	cmd->header.seq = (UBYTE)(buffer[1] >> 4);
-	cmd->addr = ((DBYTE)(buffer[2]) << 8) | (DBYTE)buffer[3];
-	cmd->func = buffer[4];
-	cmd->cmd[0] = buffer[5];
-	cmd->cmd[1] = buffer[6];
-	cmd->cmd[2] = buffer[7];
-	cmd->cmd[3] = buffer[8];
+	cmd->header.seq = (UBYTE)(queueBuffer[0] >> 4);	
+	cmd->addr = ((DBYTE)(queueBuffer[1]) << 8) | (DBYTE)queueBuffer[2];	
+	cmd->func = queueBuffer[3];	
+	cmd->cmd[0] = queueBuffer[4];
+	cmd->cmd[1] = queueBuffer[5];
+	cmd->cmd[2] = queueBuffer[6];
+	cmd->cmd[3] = queueBuffer[7];
 
 	return OK;
 }
 
-HtDecodeResult ht_decode_flow(hometalkFLOW* flow, UBYTE* buffer){
+HtDecodeResult ht_decode_flow(hometalkFLOW* flow, circular_buffer* buffer) {
 	DBYTE crcSum;
+	UBYTE queueBuffer[5];
+	
 	if(NULL == buffer || NULL == flow) {
 		return POINTER_ERROR;
 	}
+	
+	//ht_cb_pop_front(buffer, queueBuffer); /* get magic number */
+	//if(HT_MAGIC_NUMBER != queueBuffer[0]) {
+	//	return MAGIC_NUM_ERROR;
+	//}
+
+	ht_cb_pop_block_front(buffer, queueBuffer, 5); /* get whole FLOW frame from queue */
 
 	/* check CRC check sum */
-	crcSum = (((DBYTE)buffer[4]) << 8) | ((DBYTE)buffer[5]);
-	if(crc16(buffer+1, 3, 0) != crcSum) {
+	crcSum = (((DBYTE)queueBuffer[3]) << 8) | ((DBYTE)queueBuffer[4]);
+	if(crc16(queueBuffer, 3, 0) != crcSum) {
 		return CRC_ERROR;
 	}
 
-	flow->header.seq = (UBYTE)(buffer[1] >> 4) & 0x0F;
-	flow->sender = ((DBYTE)(buffer[2]) << 8) | (DBYTE)buffer[3];
+	flow->header.seq = (UBYTE)(queueBuffer[0] >> 4) & 0x0F;
+	flow->sender = ((DBYTE)(queueBuffer[1]) << 8) | (DBYTE)queueBuffer[2];
 
 	return OK;
 }
 
-HtDecodeResult ht_decode_psi(hometalkPSI* psi, UBYTE* buffer){
+HtDecodeResult ht_decode_psi(hometalkPSI* psi, circular_buffer* buffer) {
 	DBYTE crcSum;
-
+	UBYTE queueBuffer[14];
+	
 	if(NULL == buffer || NULL == psi) {
 		return POINTER_ERROR;
 	}
+	
+	//ht_cb_pop_front(buffer, queueBuffer); /* get magic number */
+	//if(HT_MAGIC_NUMBER != queueBuffer[0]) {
+	//	return MAGIC_NUM_ERROR;
+	//}
 
+	ht_cb_pop_block_front(buffer, queueBuffer, 14); /* get whole PSI frame from queue */
+	
 	/* check CRC check sum */
-	crcSum = (((DBYTE)buffer[13]) << 8) | ((DBYTE)buffer[14]);
-	if(crc16(buffer+1, 12, 0) != crcSum) {
+	crcSum = (((DBYTE)queueBuffer[12]) << 8) | ((DBYTE)queueBuffer[13]);
+	if(crc16(queueBuffer, 12, 0) != crcSum) {
 		return CRC_ERROR;
 	}
 
-	psi->header.seq = (UBYTE)(buffer[1] >> 4);
-	psi->addr = ((DBYTE)(buffer[2]) << 8) | (DBYTE)buffer[3];
-	psi->ID = buffer[4] >> 4;
-	psi->res = buffer[4] & 0x0F;
-	psi->payload[0]	= buffer[5];
-	psi->payload[1]	= buffer[6];
-	psi->payload[2]	= buffer[7];
-	psi->payload[3]	= buffer[8];
-	psi->payload[4]	= buffer[9];
-	psi->payload[5]	= buffer[10];
-	psi->payload[6]	= buffer[11];
-	psi->payload[7]	= buffer[12];
+	psi->header.seq = (UBYTE)(queueBuffer[0] >> 4);
+	psi->addr = ((DBYTE)(queueBuffer[1]) << 8) | (DBYTE)queueBuffer[2];
+	psi->ID = queueBuffer[3] >> 4;
+	psi->res = queueBuffer[3] & 0x0F;
+	psi->payload[0]	= queueBuffer[4];
+	psi->payload[1]	= queueBuffer[5];
+	psi->payload[2]	= queueBuffer[6];
+	psi->payload[3]	= queueBuffer[7];
+	psi->payload[4]	= queueBuffer[8];
+	psi->payload[5]	= queueBuffer[9];
+	psi->payload[6]	= queueBuffer[10];
+	psi->payload[7]	= queueBuffer[11];
 
 	return OK;
 }
