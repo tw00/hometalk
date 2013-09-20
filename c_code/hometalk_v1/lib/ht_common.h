@@ -21,6 +21,10 @@
 
 #include <stdio.h>
 
+#ifdef __cplusplus	/* to make the lib compatible to Arduino */
+extern "C"{
+#endif
+
 typedef enum { 
     CMD  = 0,
     eCMD = 1,
@@ -32,13 +36,18 @@ typedef enum {
 typedef enum {
 	OK = 0,
 	CRC_ERROR = 1,
-	POINTER_ERROR = 2
+	POINTER_ERROR = 2,
+	MAGIC_NUM_ERROR = 3
 } HtDecodeResult;
 
-typedef enum {
-    false = 0,
-    true
-} BOOL;
+#if defined(ARDUINO)
+  #define BOOL UBYTE
+#else
+  typedef enum {
+      false = 0,
+      true
+  } BOOL;
+#endif
 
 #define HT_HEADER_CONTROLFIELD_FRT (1 << 3)  /* frame type */
 #define HT_HEADER_CONTROLFIELD_RES (1 << 2)  /* RESERVED = 1 */
@@ -46,6 +55,7 @@ typedef enum {
 #define HT_HEADER_CONTROLFIELD_ROU (1 << 0)  /* Routing bit */
 
 #define HT_MAGIC_NUMBER 0xAAU
+#define HT_HEADER_MAGIC_BYTE HT_MAGIC_NUMBER
 
 typedef char HBYTE; // IMMER?
 typedef char BYTE; // IMMER?
@@ -53,12 +63,11 @@ typedef unsigned char UBYTE;
 typedef unsigned long QUAD_BYTE; // IMMER?
 typedef unsigned short DBYTE;
 
-#define HT_HEADER_MAGIC_BYTE 0xAB
 
 #define HT_CMD_FRAME_LENGTH 11
 #define HT_EXCMD_FRAME_LENGTH 17
 #define HT_FLOW_FRAME_LENGTH 6
-#define HT_PSI_FRAME_LENGTH 6
+#define HT_PSI_FRAME_LENGTH 15
 
 /*typedef struct 
 {
@@ -128,5 +137,8 @@ typedef struct
 
 #define HT_FRAME_LENGTH 16
 
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif
